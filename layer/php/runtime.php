@@ -14,8 +14,8 @@
  */
 class LambdaRuntime
 {
-    const POST = "POST";
-    const GET = "GET";
+    const POST = 'POST';
+    const GET = 'GET';
 
     private $url;
     private $functionCodePath;
@@ -72,15 +72,16 @@ class LambdaRuntime
 
     /**
      * Add string to the response buffer. This is printed out on success.
+     * @param $str
      */
     public function addToResponse($str) {
-        $this->response = $this->response.$str;
+        $this->response .= $str;
     }
 
     public function flushResponse() {
         $result = $this->curl(
-            "/2018-06-01/runtime/invocation/".$this->getRequestId()."/response",
-            LambdaRuntime::POST,
+            '/2018-06-01/runtime/invocation/' .$this->getRequestId(). '/response',
+            self::POST,
             $this->getResponse()
         );
         $this->resetResponse();
@@ -90,9 +91,9 @@ class LambdaRuntime
      * Get the Next event data
      */
     public function getNextEventData() {
-        $this->rawEventData = $this->curl("/2018-06-01/runtime/invocation/next", LambdaRuntime::GET);
+        $this->rawEventData = $this->curl('/2018-06-01/runtime/invocation/next', self::GET);
 
-        if(!isset($this->rawEventData["headers"]["lambda-runtime-aws-request-id"][0])) {
+        if(!isset($this->rawEventData["headers"]['lambda-runtime-aws-request-id'][0])) {
             //Handle error
             $this->reportError(
                 "MissingEventData",
@@ -137,6 +138,10 @@ class LambdaRuntime
 
     /**
      * Internal function to make curl requests to the runtime API
+     * @param $urlPath
+     * @param $method
+     * @param string $payload
+     * @return array
      */
     private function curl($urlPath, $method, $payload="") {
 
@@ -193,10 +198,10 @@ $lambdaRuntime = new LambdaRuntime();
 $handler =  $lambdaRuntime->getHandler();
 
 //Extract file name and function
-list($handlerFile , $handlerFunction) = explode(".", $handler);
+list($handlerFile , $handlerFunction) = explode('.', $handler);
 
 //Include the handler file
-require_once($handlerFile.".php");
+require_once "{$handlerFile}.php";
 
 //Poll for the next event to be processed
 
@@ -217,8 +222,8 @@ while (true) {
         //Handler is of format Filename.function
         //Execute handler
         $functionReturn = $handlerFunction($eventPayload);
-        $json = json_encode($functionReturn, true);
-        $lambdaRuntime->addToResponse($json);
+        $response = json_encode($functionReturn, true);
+        $lambdaRuntime->addToResponse($response);
     } catch (\Throwable $e) {
         error_log((string)$e);
     }
