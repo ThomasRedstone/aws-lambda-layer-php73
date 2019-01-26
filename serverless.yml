@@ -1,0 +1,27 @@
+service: php73
+provider:
+  name: aws
+  runtime: provided
+  region: eu-west-1
+  memorySize: 128
+layers:
+  php:
+    path: layer/php
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          method: POST
+          path: /
+      - http:
+          method: POST
+          path: /{any+} # Catch all unknown routes and redirect to main handler
+      - http:
+          method: GET
+          path: /
+      - http:
+          method: GET
+          path: /{any+} # Catch all unknown routes and redirect to main handler
+    layers:
+      - {Ref: PhpLambdaLayer}
