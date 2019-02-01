@@ -196,7 +196,7 @@ $handler =  $lambdaRuntime->getHandler();
 list($handlerFile , $handlerFunction) = explode(".", $handler);
 
 //Include the handler file
-require_once($handlerFile.".php");
+require_once "src/handlers/{$handlerFile}.php";
 
 //Poll for the next event to be processed
 

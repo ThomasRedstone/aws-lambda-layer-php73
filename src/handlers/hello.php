@@ -1,9 +1,20 @@
 <?php
-function hello($eventData) : array
+function main($eventData) : array
 {
-    $response = ['msg' => 'hello from PHP '.PHP_VERSION];
-    $response['eventData'] = $eventData;
-    $data = json_decode($eventData);
-    $response['data'] = $data;
+    $event = json_decode($eventData, true);
+    $response = [
+        'isBase64Encoded' => false,
+        'statusCode' => 200,
+        'headers' => ['content-type' => 'text/html'],
+        'body' => json_encode([
+            'method' => $event['httpMethod'],
+            'queryString' => empty($event['multiValueQueryStringParameters']) ? false : $event['multiValueQueryStringParameters'],
+            'urlPath' => empty($event['requestContext']['path']) ? false : $event['requestContext']['path'],
+            'postBody' => empty($event['body']) ? false : event['body']
+        ])
+    ];
+    #$response['eventData'] = $eventData;
+    #$data = json_decode($eventData);
+    #$response['data'] = $data;
     return $response;
 }

@@ -9,7 +9,7 @@ layers:
     path: layer/php
 functions:
   hello:
-    handler: handler.hello
+    handler: hello.main
     events:
       - http:
           method: POST
