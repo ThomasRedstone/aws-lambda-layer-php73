@@ -214,6 +214,31 @@ while (true) {
     $eventPayload = $lambdaRuntime->getEventPayload();
 
     try {
+        if(!empty($event['httpMethod'])) {
+            $_SERVER['REQUEST_METHOD'] = $event['httpMethod'];
+            $_SERVER['HTTP_HOST'] = 'dev.baycrazy.co'; //$event['requestContext']['path'];
+            $_SERVER['REQUEST_URI'] = $event['requestContext']['path'];
+            error_log(json_encode($_SERVER));
+            error_log(json_encode($event['multiValueQueryStringParameters']));
+            $query = '';
+            if (!empty($event['multiValueQueryStringParameters'])) {
+                foreach ($event['multiValueQueryStringParameters'] as $field => $values) {
+                    foreach ($values as $value) {
+                        $query .= ($query === '' ? '?' : '&') . "{$field}={$value}";
+                        if (false && count($values) > 1) {
+                            if (!isset($_GET[$field])) {
+                                $_GET[$field] = [];
+                            }
+                            $_GET[$field][] = $value;
+                        } else {
+                            $_GET[$field] = $value;
+                        }
+                    }
+                }
+            }
+            $_SERVER['QUERY_STRING'] = $query;
+        }
+
         //Handler is of format Filename.function
         //Execute handler
         $functionReturn = $handlerFunction($eventPayload);
